@@ -89,28 +89,34 @@
     });
 </script>
 
-<script type="module">
-    import { fs } from "electron";
-
+<script type='module'>
+    import { ipcRenderer, fs } from 'electron';
+    
     // Add this function to display images in the selected directory
     async function displayImages(directoryPath) {
+        document.getElementById("images").innerHTML = '';  // Empty the div first
+        
         const files = await fs.promises.readdir(directoryPath);
-
+        
         for (const file of files) {
             if (!file.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/)) continue; // Skip non-image files
-
-            const imgElement = document.createElement("img");
+            
+            const imgElement = document.createElement('img');
             imgElement.src = path.join(directoryPath, file);
             document.getElementById("images").appendChild(imgElement);
         }
     }
-
-    ipcRenderer.on("directory-selected", (event, directory) => {
-        window.selectedDirectory = directory;
-
-        // Call displayImages when a directory is selected
-        displayImages(directory).catch((error) =>
-            console.log("Error displaying images:", error)
-        );
+    
+    function watchDirectory(directoryPath) {
+        fs.watch(directoryPath, (eventType, filename) => {
+            if (['rename', 'change'].includes(eventType)) {  // Only update on new files or modifications
+                displayImages(directoryPath).catch((error) => console.log('Error: ', error));
+            }
+        });
+    }
+    
+    ipcRenderer.on('directory-selected', (_, directoryPath) => {
+        watchDirectory(directoryPath);  // Set up a file system watcher on the selected directory
+        displayImages(directoryPath).catch((error) => console.log('Error: ', error));  // Display initial set of images
     });
 </script>
