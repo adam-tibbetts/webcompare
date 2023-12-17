@@ -13,7 +13,7 @@ module.exports.generateUrlList = async function generateUrlList (
   const baseDomain = new URL(baseUrl).hostname
   const maxDepth = settings.depth
   const queue = [{ url: baseUrl, depth: 0 }]
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({headless: 'new' })
   const urlList = []
 
   while (queue.length > 0) {
