@@ -7,12 +7,17 @@
     <h1>WebCompare pre-alpha</h1>
     <h2>Settings</h2>
     <button id="select-directory">Select Directory</button>
+    <p id="selected-directory-display">Selected directory: None</p>
     <form id="settings-form">
         <h4>Site URL</h4>
         <input type="text" id="baseUrl" value="https://seoplus.com/" />
         <h4>Crawl depth</h4>
         <input type="number" id="depth" value="1" min="0" />
-        <input type="button" id="generateUrlListButton" value="Generate URL List" />
+        <input
+            type="button"
+            id="generateUrlListButton"
+            value="Generate URL List"
+        />
         <input
             type="submit"
             id="startCrawlButton"
@@ -20,15 +25,15 @@
             disabled
         />
     </form>
-    
+
     <h2>URLs to be crawled</h2>
     <ul id="url-list"></ul>
-    
+
     <h2>Screenshots Taken</h2>
     <ul id="screenshot-list"></ul>
-    
+
     <h2>Screenshots</h2>
-    <div id="images"></div>
+    <ul id="image-list"></ul>
 </section>
 
 <script src="renderer.js"></script>
