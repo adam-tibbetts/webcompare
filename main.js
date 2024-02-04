@@ -40,8 +40,8 @@ ipcMain.handle("read-directory", async (event, directoryPath) => {
 });
 
 ipcMain.handle("generate-url-list", async (event, settings) => {
-    const urlList = await urlListGenerator.generateUrlList(settings, event);
-    return urlList;
+    console.log("ipcMain.handle(generate-url-list)");
+    return await urlListGenerator.generateUrlList(settings);
 });
 
 ipcMain.handle("start-crawl", async (event, settings, urlList) => {

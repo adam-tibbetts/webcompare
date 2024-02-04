@@ -10,8 +10,25 @@ document
             depth: document.getElementById("depth").value,
             directory: window.selectedDirectory,
         };
+        console.log("renderer.js got a click from generateUrlListButton");
+        ipcRenderer
+            .invoke("generate-url-list", settings)
+            .then((urlList) => {
+                // Assuming urlList is an array of URLs
+                const ulElement = document.getElementById("url-list");
+                ulElement.innerHTML = ""; // Clear existing list items if necessary
 
-        ipcRenderer.send("generate-url-list", settings);
+                // Create a list item for each URL and append it to the ul element
+                urlList.forEach((url) => {
+                    const li = document.createElement("li");
+                    li.textContent = url;
+                    ulElement.appendChild(li);
+                });
+            })
+            .catch((error) => {
+                // Handle the error, possibly by showing an error message to the user
+                console.error("Error generating URL list:", error);
+            });
     });
 
 document.getElementById("settings-form").addEventListener("submit", (event) => {
@@ -58,16 +75,15 @@ ipcRenderer.on("screenshot-saved", (event, screenshotPath) => {
     const list = document.getElementById("image-list"); // Make sure this ID matches your <ul> element in HTML
     const listItem = document.createElement("li");
     const image = document.createElement("img");
-    
+
     image.src = screenshotPath; // Set the source of the image to the screenshot path
     image.alt = "Screenshot"; // Set an alt text for the image
-    image.style.width = '100px'; // Optional: Set a width for the image if you want to resize it
-    image.style.height = 'auto'; // Optional: Keep the aspect ratio
+    image.style.width = "100px"; // Optional: Set a width for the image if you want to resize it
+    image.style.height = "auto"; // Optional: Keep the aspect ratio
 
     listItem.appendChild(image); // Append the image to the list item
     list.appendChild(listItem); // Append the list item to the list
 });
-
 
 async function displayImages(directoryPath) {
     document.getElementById("images").innerHTML = ""; // Empty the div first
