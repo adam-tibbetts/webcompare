@@ -48,10 +48,10 @@ ipcMain.handle('generate-url-list', async (event, settings) => {
 
 ipcMain.on('start-crawl', async (event, settings, urlList) => {
   try {
-    await screenshotTaker.startCrawl(settings, urlList, mainWindow);
+    await screenshotTaker.startCrawl(settings, urlList, mainWindow)
   } catch (error) {
-    console.error('Error during crawl:', error);
+    console.error('Error during crawl:', error)
     // Optionally, you can send an error message back to the renderer process
-    event.sender.send('crawl-error', error.message);
+    event.sender.send('crawl-error', error.message)
   }
-});
+})
