@@ -1,0 +1,8 @@
+#image-list {
+    padding: 40px;
+}
+
+#image-list > div {
+    float: left;
+}
+

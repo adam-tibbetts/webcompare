@@ -1,3 +1,4 @@
+const { dir, error } = require('console')
 const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const path = require('path')
@@ -46,17 +47,6 @@ document.getElementById('settings-form').addEventListener('submit', (event) => {
   ipcRenderer.send('start-crawl', settings, urlList)
 })
 
-document.getElementById('select-directory').addEventListener('click', () => {
-  ipcRenderer.invoke('select-directory').then((directory) => {
-    if (directory) {
-      window.selectedDirectory = directory
-      document.getElementById(
-        'selected-directory-display'
-      ).textContent = `Selected Directory: ${directory}`
-    }
-  })
-})
-
 ipcRenderer.on('url-list-generated', (event, urlList) => {
   const list = document.getElementById('url-list')
   list.innerHTML = urlList.map((url) => `<li>${url}</li>`).join('')
@@ -66,7 +56,7 @@ ipcRenderer.on('url-list-generated', (event, urlList) => {
 
 ipcRenderer.on('screenshot-saved', (event, screenshotPath) => {
   const list = document.getElementById('image-list')
-  const listItem = document.createElement('li')
+  const listItem = document.createElement('div')
   const image = document.createElement('img')
 
   image.src = screenshotPath // Set the source of the image to the screenshot path
@@ -78,20 +68,47 @@ ipcRenderer.on('screenshot-saved', (event, screenshotPath) => {
   list.appendChild(listItem) // Append the list item to the list
 })
 
-async function displayImages (directoryPath) {
-  document.getElementById('images').innerHTML = '' // Empty the div first
+async function displayImages(siteDirectory) {
+  const siteName = path.basename(siteDirectory);
+  const files = await fs.promises.readdir(siteDirectory);
 
-  const parentDirName = path.basename(path.dirname(directoryPath))
-  directoryPath = path.join(directoryPath, parentDirName) // Change the directoryPath to point directly to the subdirectory
-  document.querySelector('h1').textContent = `Website: ${parentDirName}` // Set the heading text to the website name (folder name)
+  // Create a new section for this site
+  const siteSection = document.createElement('section');
+  siteSection.id = `site-${siteName}`;
 
-  const files = await fs.promises.readdir(directoryPath)
+  const siteHeading = document.createElement('h3');
+  siteHeading.textContent = siteName;
+  siteSection.appendChild(siteHeading);
+
+  const imageListDiv = document.createElement('div');
+  imageListDiv.className = 'image-list'; // Use a class for styling all image lists
 
   for (const file of files) {
-    if (!file.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/)) continue // Skip non-image files
+    if (!file.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/)) continue; // Skip non-image files
 
-    const imgElement = document.createElement('img')
-    imgElement.src = path.join(directoryPath, file)
-    document.getElementById('images').appendChild(imgElement)
+    const imgElement = document.createElement('img');
+    imgElement.src = path.join(siteDirectory, file);
+    imgElement.alt = 'Screenshot';
+    imgElement.style.width = '100px';
+    imgElement.style.height = 'auto';
+
+    imageListDiv.appendChild(imgElement);
+  }
+
+  siteSection.appendChild(imageListDiv);
+  document.getElementById('sites-container').appendChild(siteSection);
+}
+
+async function displayAllSites(parentDirectory) {
+  const sitesContainer = document.getElementById('sites-container');
+  sitesContainer.innerHTML = ''; // Clear previous content
+
+  // Use IPC to read the parent directory
+  const siteDirectories = await ipcRenderer.invoke('read-directory', parentDirectory);
+  for (const siteName of siteDirectories) {
+    const sitePath = path.join(parentDirectory, siteName);
+    // Use IPC to read the site directory
+    const imageFiles = await ipcRenderer.invoke('read-directory', sitePath);
+    displayImages(sitePath, imageFiles);
   }
 }

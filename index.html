@@ -1,39 +1,40 @@
 <head>
-    <script src="node_modules/xel/xel.js" type="module"></script>
-    <meta name="xel-theme" content="node_modules/xel/themes/adwaita.css" />
-    <meta name="xel-accent-color" content="green" />
+  <script src="node_modules/xel/xel.js" type="module"></script>
+  <link rel="stylesheet" href="path/to/your/styles.css" />
+  <link rel="stylesheet" href="node_modules/xel/themes/adwaita.css" />
+  <meta name="xel-accent-color" content="green" />
 </head>
+
 <section>
-    <h1>WebCompare pre-alpha</h1>
-    <h2>Settings</h2>
-    <button id="select-directory">Select Directory</button>
-    <p id="selected-directory-display">Selected directory: None</p>
-    <form id="settings-form">
-        <h4>Site URL</h4>
-        <input type="text" id="baseUrl" value="https://seoplus.com/" />
-        <h4>Crawl depth</h4>
-        <input type="number" id="depth" value="1" min="0" />
-        <input
-            type="button"
-            id="generateUrlListButton"
-            value="Generate URL List"
-        />
-        <input
-            type="submit"
-            id="startCrawlButton"
-            value="Start Crawling"
-            disabled
-        />
-    </form>
+  <h1>WebCompare pre-alpha</h1>
+  <h2>Settings</h2>
+  <button id="select-directory">Select Directory</button>
+  <p id="selected-directory-display">Selected directory: None</p>
+  <form id="settings-form">
+    <h4>Site URL</h4>
+    <input type="text" id="baseUrl" value="https://seoplus.com/" />
+    <h4>Crawl depth</h4>
+    <input type="number" id="depth" value="1" min="0" />
+    <input type="button" id="generateUrlListButton" value="Generate URL List" />
+    <input
+      type="submit"
+      id="startCrawlButton"
+      value="Start Crawling"
+      disabled
+    />
+  </form>
 
-    <h2>URLs to be crawled</h2>
-    <ul id="url-list"></ul>
+  <h2>URLs to be crawled</h2>
+  <ul id="url-list"></ul>
 
-    <h2>Screenshots Taken</h2>
-    <ul id="screenshot-list"></ul>
+  <h2>Screenshots Taken</h2>
+  <ul id="screenshot-list"></ul>
 
-    <h2>Screenshots</h2>
+  <h2>Screenshots</h2>
+  <div id="sites-container">
+    <h3></h3>
     <div id="image-list"></div>
+  </div>
 </section>
 
 <script src="renderer.js"></script>
