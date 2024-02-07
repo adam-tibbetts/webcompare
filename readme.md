@@ -1,4 +1,3 @@
-```markdown
 # WebCompare
 
 WebCompare is an Electron application designed to help users monitor changes on websites by taking screenshots and comparing them with previous versions. This tool is particularly useful for web developers, QA engineers, and content managers who need to ensure that their websites are functioning correctly after updates, or to simply track visual changes over time.
