@@ -96,13 +96,15 @@ async function displayAllSites(parentDirectory) {
       parentDirectory,
       false
     );
+    console.log('Parent directory entries:', entries);
 
     // Filter out files and keep only directories
     const siteDirectories = entries.filter((entry) => entry.isDirectory);
+    console.log('Site directories:', siteDirectories);
 
     for (const directory of siteDirectories) {
       const siteName = directory.name;
-      console.log('siteName: ', siteName);
+      console.log('Processing site:', siteName);
 
       try {
         // Read all entries in the directory
@@ -111,13 +113,14 @@ async function displayAllSites(parentDirectory) {
           path.join(parentDirectory, siteName),
           false
         );
+        console.log(`Entries for ${siteName}:`, directoryEntries);
 
         // Filter out directories and map to file paths
         const imageFiles = directoryEntries
           .filter((entry) => !entry.isDirectory)
           .map((entry) => path.join(parentDirectory, siteName, entry.name));
 
-        console.log('imageFiles: ', imageFiles);
+        console.log(`Image files for ${siteName}:`, imageFiles);
 
         if (imageFiles.length > 0) {
           displayImagesWithHeading(parentDirectory, imageFiles, siteName);
@@ -125,12 +128,16 @@ async function displayAllSites(parentDirectory) {
           console.log(`No images found in ${siteName}`);
         }
       } catch (error) {
-        console.log('An error occurred while reading directory: ', error);
+        console.log(
+          'An error occurred while reading directory for site:',
+          siteName,
+          error
+        );
         continue; // Skip to the next iteration of the loop
       }
     }
   } catch (error) {
-    console.log('An error occurred while reading parent directory: ', error);
+    console.log('An error occurred while reading parent directory:', error);
   }
 }
 
