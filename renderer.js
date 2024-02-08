@@ -145,6 +145,7 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   // Create a new section for this site
   const siteSection = document.createElement('section');
   siteSection.id = `site-${siteName}`;
+  siteSection.className = 'imageSection';
 
   const siteHeading = document.createElement('h3');
   siteHeading.textContent = siteName;
@@ -164,21 +165,4 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   siteSection.appendChild(imageListDiv); // Append the div to the parent section
 
   document.getElementById('sites-container').appendChild(siteSection);
-}
-
-async function displayImages(siteDirectory, imageFiles, siteSection) {
-  console.log('dipslayImages', siteDirectory);
-
-  const imageListDiv = document.createElement('div');
-  imageListDiv.className = 'image-list'; // Use a class for styling all image lists
-
-  for (const file of imageFiles) {
-    const imgElement = document.createElement('img');
-    imgElement.src = `file://${path.join(siteDirectory, file)}`;
-    imgElement.alt = 'Screenshot';
-
-    imageListDiv.appendChild(imgElement);
-  }
-
-  siteSection.appendChild(imageListDiv); // Append the div to the parent section
 }
