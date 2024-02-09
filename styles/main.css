@@ -5,6 +5,11 @@ body {
     padding: 20px;
 }
 
+#url-list {
+    list-style-type: none;
+    padding-left: 0;
+  }  
+
 #image-list {
     padding: 40px;
 }

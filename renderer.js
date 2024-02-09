@@ -6,6 +6,7 @@ const path = require('path');
 document
   .getElementById('generateUrlListButton')
   .addEventListener('click', () => {
+    document.getElementById('loading-spinner').style.display = 'block';
     const settings = {
       baseUrl: document.getElementById('baseUrl').value,
       depth: document.getElementById('depth').value,
@@ -15,20 +16,33 @@ document
     ipcRenderer
       .invoke('generate-url-list', settings)
       .then((urlList) => {
-        // Assuming urlList is an array of URLs
+        document.getElementById('loading-spinner').style.display = 'none';
         const ulElement = document.getElementById('url-list');
         ulElement.innerHTML = ''; // Clear existing list items if necessary
 
-        // Create a list item for each URL and append it to the ul element
-        urlList.forEach((url) => {
+        // Create a list item with a checkbox for each URL and append it to the ul element
+        urlList.forEach((url, index) => {
           const li = document.createElement('li');
-          li.textContent = url;
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = `url-checkbox-${index}`; // Unique ID for each checkbox
+          checkbox.checked = true; // By default, all checkboxes are checked
+          checkbox.classList.add('url-checkbox'); // Class for styling or selecting checkboxes
+
+          const label = document.createElement('label');
+          label.htmlFor = checkbox.id;
+          label.textContent = url;
+          label.style.marginLeft = '8px'; // Add some space between the checkbox and the label
+
+          li.appendChild(checkbox);
+          li.appendChild(label);
           ulElement.appendChild(li);
         });
       })
       .catch((error) => {
         // Handle the error, possibly by showing an error message to the user
         console.error('Error generating URL list:', error);
+        document.getElementById('loading-spinner').style.display = 'none';
       });
   });
 
@@ -40,9 +54,10 @@ document.getElementById('settings-form').addEventListener('submit', (event) => {
     directory: window.selectedDirectory,
   };
 
-  const urlList = Array.from(document.querySelectorAll('#url-list li')).map(
-    (li) => li.textContent
-  );
+  // Get only the checked URLs
+  const urlList = Array.from(
+    document.querySelectorAll('#url-list li input:checked')
+  ).map((checkbox) => checkbox.nextElementSibling.textContent);
 
   ipcRenderer.send('start-crawl', settings, urlList);
 });
