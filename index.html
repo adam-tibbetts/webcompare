@@ -1,4 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="node_modules/xel/xel.js" type="module"></script>
   <link rel="stylesheet" href="styles/main.css" />
   <link rel="stylesheet" href="styles/spinner.css" />
@@ -26,16 +31,16 @@
   </form>
 
   <h2>URLs to be crawled</h2>
-  <div id="loading-spinner" class="spinner" style="display: none;"></div>
+  <div id="loading-spinner" class="spinner" style="display: none"></div>
   <ul id="url-list"></ul>
 
   <h2>Screenshots Taken</h2>
   <ul id="screenshot-list"></ul>
 
   <h2>Screenshots</h2>
-  <div id="sites-container">
-    <h3></h3>
-    <div id="image-list"></div>
+  <div id="tabs-container"></div> <!-- Container for tabs -->
+  <div id="sites-container"></div> <!-- Container for content -->
+
   </div>
 </section>
 

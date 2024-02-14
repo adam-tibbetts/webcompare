@@ -46,6 +46,13 @@ document
       });
   });
 
+ipcRenderer.on('url-list-generated', (event, urlList) => {
+  const list = document.getElementById('url-list');
+  list.innerHTML = urlList.map((url) => `<li>${url}</li>`).join('');
+
+  document.getElementById('startCrawlButton').disabled = false;
+});
+
 document.getElementById('settings-form').addEventListener('submit', (event) => {
   event.preventDefault();
 
@@ -60,13 +67,6 @@ document.getElementById('settings-form').addEventListener('submit', (event) => {
   ).map((checkbox) => checkbox.nextElementSibling.textContent);
 
   ipcRenderer.send('start-crawl', settings, urlList);
-});
-
-ipcRenderer.on('url-list-generated', (event, urlList) => {
-  const list = document.getElementById('url-list');
-  list.innerHTML = urlList.map((url) => `<li>${url}</li>`).join('');
-
-  document.getElementById('startCrawlButton').disabled = false;
 });
 
 ipcRenderer.on('screenshot-saved', (event, screenshotPath) => {
@@ -86,98 +86,203 @@ ipcRenderer.on('screenshot-saved', (event, screenshotPath) => {
 document
   .getElementById('select-directory')
   .addEventListener('click', async () => {
-    console.log('Get directory handler in renderer.js clicked.');
-    const parentDirectory = await ipcRenderer.invoke('select-directory');
-    if (parentDirectory) {
-      console.log('if (parentDirectory) evaluated true');
-      window.selectedDirectory = parentDirectory; // Store the selected directory path
-      document.getElementById(
-        'selected-directory-display'
-      ).textContent = `Selected Directory: ${parentDirectory}`;
-      displayAllSites(parentDirectory);
+    console.log('Directory selection initiated.');
+    try {
+      const parentDirectory = await ipcRenderer.invoke('select-directory');
+      console.log(`Directory selected: ${parentDirectory}`);
+
+      if (parentDirectory) {
+        console.log('Directory selection successful.');
+        window.selectedDirectory = parentDirectory; // Store the selected directory path
+        document.getElementById(
+          'selected-directory-display'
+        ).textContent = `Selected Directory: ${parentDirectory}`;
+        displayAllSites(parentDirectory);
+      } else {
+        console.warn('No directory was selected.');
+      }
+    } catch (error) {
+      console.error('Error selecting directory:', error);
     }
   });
 
 async function displayAllSites(parentDirectory) {
-  console.log('displayAllSites, ', parentDirectory);
+  console.log(`Displaying all sites for directory: ${parentDirectory}`);
 
   const sitesContainer = document.getElementById('sites-container');
+  if (!sitesContainer) {
+    console.error('Failed to find the sites-container element.');
+    return;
+  }
+
   sitesContainer.innerHTML = ''; // Clear previous content
 
   try {
-    // Get all entries in the parent directory
     const entries = await ipcRenderer.invoke(
       'read-directory',
       parentDirectory,
       false
     );
-    console.log('Parent directory entries:', entries);
+    console.log(`Entries in ${parentDirectory}:`, entries);
 
-    // Filter out files and keep only directories
     const siteDirectories = entries.filter((entry) => entry.isDirectory);
-    console.log('Site directories:', siteDirectories);
+    console.log('Filtered site directories:', siteDirectories);
+
+    if (siteDirectories.length === 0) {
+      console.log('No directories found within the selected directory.');
+    }
 
     for (const directory of siteDirectories) {
-      const siteName = directory.name;
-      console.log('Processing site:', siteName);
-
+      console.log(`Processing directory: ${directory.name}`);
       try {
-        // Read all entries in the directory
         const directoryEntries = await ipcRenderer.invoke(
           'read-directory',
-          path.join(parentDirectory, siteName),
+          path.join(parentDirectory, directory.name),
           false
         );
-        console.log(`Entries for ${siteName}:`, directoryEntries);
+        console.log(`Entries for ${directory.name}:`, directoryEntries);
 
-        // Filter out directories and map to file paths
         const imageFiles = directoryEntries
           .filter((entry) => !entry.isDirectory)
-          .map((entry) => path.join(parentDirectory, siteName, entry.name));
-
-        console.log(`Image files for ${siteName}:`, imageFiles);
+          .map((entry) =>
+            path.join(parentDirectory, directory.name, entry.name)
+          );
+        console.log(`Image files for ${directory.name}:`, imageFiles);
 
         if (imageFiles.length > 0) {
-          displayImagesWithHeading(parentDirectory, imageFiles, siteName);
+          displayImagesWithHeading(parentDirectory, imageFiles, directory.name);
         } else {
-          console.log(`No images found in ${siteName}`);
+          console.log(`No images found in ${directory.name}.`);
         }
       } catch (error) {
-        console.log(
-          'An error occurred while reading directory for site:',
-          siteName,
-          error
-        );
-        continue; // Skip to the next iteration of the loop
+        console.error(`Error processing directory ${directory.name}:`, error);
       }
     }
   } catch (error) {
-    console.log('An error occurred while reading parent directory:', error);
+    console.error('Error reading parent directory:', error);
   }
 }
 
 function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
-  // Create a new section for this site
-  const siteSection = document.createElement('section');
-  siteSection.id = `site-${siteName}`;
-  siteSection.className = 'imageSection';
-
-  const siteHeading = document.createElement('h3');
-  siteHeading.textContent = siteName;
-  siteSection.appendChild(siteHeading);
-
-  const imageListDiv = document.createElement('div');
-  imageListDiv.className = 'image-list'; // Use a class for styling all image lists
-
-  for (const filePath of imageFiles) {
-    const imgElement = document.createElement('img');
-    imgElement.src = `file://${filePath}`; // Set the full file path using the file:// protocol
-    imgElement.alt = 'Screenshot';
-
-    imageListDiv.appendChild(imgElement);
+  console.log(`Displaying images for site: ${siteName}`);
+  const tabsContainer = document.getElementById('tabs-container'); // Container for tabs
+  const sitesContainer = document.getElementById('sites-container'); // Container for content
+  if (!tabsContainer || !sitesContainer) {
+    console.error(
+      'Failed to find the tabs-container or sites-container elements for displaying images.'
+    );
+    return;
   }
 
-  siteSection.appendChild(imageListDiv); // Append the div to the parent section
+  // Use a regular expression to extract the date and time from the siteName
+  // The format is assumed to be "example.com-YYYYMMDD-HHMMSS"
+  const match = siteName
+    .trim()
+    .match(/-(\d{4})-(\d{2})-(\d{2})-(\d{2})(\d{2})\d{2}$/);
+  if (!match) {
+    console.error('Failed to extract date and time from siteName:', siteName);
+    return;
+  }
 
-  document.getElementById('sites-container').appendChild(siteSection);
+  // Extracted parts are at indices 1 to 5 due to how match groups are ordered
+  const [_, year, month, day, hour, minute] = match;
+  const date = `${year}-${month}-${day}`;
+  const time = `${hour}:${minute}`;
+  const formattedDate = formatDateAndTime(date, time); // Assuming formatDateAndTime is a function you've defined elsewhere
+
+  // Create tab
+  const tabButton = document.createElement('button');
+  tabButton.className = 'tab';
+  tabButton.id = `tab-${siteName}`; // Assign a unique ID based on siteName
+  tabButton.textContent = `${siteName.split('-')[0]} ${formattedDate}`;
+  tabButton.onclick = function () {
+    showTabContent(siteName);
+  };
+
+  // Append the tab to the tabs container
+  tabsContainer.appendChild(tabButton);
+
+  // Create content div for this site
+  const contentDiv = document.createElement('div');
+  contentDiv.id = `content-${siteName}`; // Ensure the ID matches the pattern used in the JavaScript logic
+  contentDiv.className = 'tab-content';
+  contentDiv.style.display = 'none'; // Hide content by default
+
+  imageFiles.forEach((filePath) => {
+    const imgElement = document.createElement('img');
+    imgElement.src = `file://${filePath}`;
+    imgElement.alt = 'Screenshot';
+    contentDiv.appendChild(imgElement);
+  });
+
+  // Append content to the sites container
+  sitesContainer.appendChild(contentDiv);
+}
+
+// Global array to track selected tabs
+let selectedTabs = [];
+
+function showTabContent(siteName) {
+  const contentDivId = `content-${siteName}`;
+  const tabButtonId = `tab-${siteName}`;
+  const index = selectedTabs.indexOf(contentDivId);
+
+  // Toggle the selection state of the tab
+  if (index > -1) {
+    // If the tab is already selected, deselect it
+    selectedTabs.splice(index, 1);
+    document.getElementById(tabButtonId).classList.remove('active');
+  } else {
+    // Add the tab to the selectedTabs array if not already selected
+    if (!selectedTabs.includes(contentDivId)) {
+      selectedTabs.push(contentDivId);
+      document.getElementById(tabButtonId).classList.add('active');
+    }
+  }
+
+  // Update the display of each tab content based on selection
+  document.querySelectorAll('.tab-content').forEach((div) => {
+    if (selectedTabs.includes(div.id)) {
+      div.style.display = 'block'; // Show selected tab content
+    } else {
+      div.style.display = 'none'; // Hide unselected tab content
+    }
+  });
+
+  // Adjust the layout based on the number of selected tabs
+  const sitesContainer = document.getElementById('sites-container');
+  if (selectedTabs.length === 2) {
+    sitesContainer.classList.add('two-columns');
+  } else {
+    sitesContainer.classList.remove('two-columns');
+  }
+}
+
+function formatDateAndTime(date, time) {
+  console.log(`Formatting date and time from: ${date} ${time}`);
+  try {
+    // Split the date and time strings on their respective separators
+    const [year, month, day] = date.split('-');
+    const [hour, minute] = time.split(':');
+
+    // Create a new Date object using the extracted values
+    const formattedDate = new Date(
+      `${year}-${month}-${day}T${hour}:${minute}:00`
+    ).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+
+    console.log(`Formatted date and time: ${formattedDate}`);
+    return formattedDate;
+  } catch (error) {
+    console.error(
+      `Error formatting date and time from ${date} ${time}:`,
+      error
+    );
+    return `${date} ${time}`; // Return a fallback string in case of error
+  }
 }

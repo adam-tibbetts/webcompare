@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const urlListGenerator = require('./crawler/urlListGenerator');
 const screenshotTaker = require('./crawler/screenshotTaker');
+const imageCompare = require('./imageCompare/imageCompare');
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -59,31 +60,32 @@ async function readDirectory(directoryPath) {
       )
     );
 
-    return files;
+  return files;
 }
 
-ipcMain.handle('read-directory', async (event, directoryPath, includeSubdirectories = false) => {
-  try {
-    console.log('receiving read-directory ipcMain.handle', directoryPath);
-    
-    const files = await readDirectory(directoryPath, includeSubdirectories);
-    
-    // Map Dirent objects to file paths
-    const fileList = files.map(file => ({
-      name: file.name,
-      isDirectory: file.isDirectory(),
-      path: path.join(directoryPath, file.name) // Add the full file path
-    }));
-    
-    console.log('read-directory returning files: ', fileList);
-    return fileList;
-  } catch (error) {
-    console.error('An error occurred while reading directory: ', error);
-    throw error;
+ipcMain.handle(
+  'read-directory',
+  async (event, directoryPath, includeSubdirectories = false) => {
+    try {
+      console.log('receiving read-directory ipcMain.handle', directoryPath);
+
+      const files = await readDirectory(directoryPath, includeSubdirectories);
+
+      // Map Dirent objects to file paths
+      const fileList = files.map((file) => ({
+        name: file.name,
+        isDirectory: file.isDirectory(),
+        path: path.join(directoryPath, file.name), // Add the full file path
+      }));
+
+      console.log('read-directory returning files: ', fileList);
+      return fileList;
+    } catch (error) {
+      console.error('An error occurred while reading directory: ', error);
+      throw error;
+    }
   }
-});
-
-
+);
 
 ipcMain.handle('generate-url-list', async (event, settings) => {
   console.log('ipcMain.handle(generate-url-list)');
@@ -94,10 +96,62 @@ ipcMain.handle('generate-url-list', async (event, settings) => {
 
 ipcMain.on('start-crawl', async (event, settings, urlList) => {
   try {
+    // Start the screenshot taking process
     await screenshotTaker.startCrawl(settings, urlList, mainWindow);
+
+    // Assuming the directory where screenshots are saved is accessible via settings.directory
+    const currentDir = settings.directory;
+    const previousDir = findPreviousDir(currentDir);
+    if (previousDir) {
+      // Perform the comparison
+      const totalDifferences = await imageCompare.compareScreenshotSets(
+        currentDir,
+        previousDir
+      );
+      // Send the comparison results back to the renderer process
+      event.sender.send('comparison-complete', totalDifferences);
+    } else {
+      console.log('No previous directory found for comparison.');
+      event.sender.send(
+        'comparison-skipped',
+        'No previous directory found for comparison.'
+      );
+    }
   } catch (error) {
-    console.error('Error during crawl:', error);
-    // Optionally, you can send an error message back to the renderer process
+    console.error('Error during crawl or comparison:', error);
     event.sender.send('crawl-error', error.message);
   }
 });
+
+function findPreviousDir(currentDir) {
+  const parentDir = path.dirname(currentDir);
+  // List all directories within the parent directory
+  const dirs = fs.readdirSync(parentDir).filter((f) => {
+    const dirPath = path.join(parentDir, f);
+    return fs.statSync(dirPath).isDirectory();
+  });
+
+  // Filter directories based on the date and time pattern in their names and sort them
+  const sortedDirs = dirs
+    .filter((dirName) => /\d{4}-\d{2}-\d{2}-\d{6}$/.test(dirName)) // Look for directories ending with the date-time pattern
+    .sort((a, b) => {
+      // Extract timestamps from directory names for comparison
+      const timeStampA = a
+        .match(/(\d{4}-\d{2}-\d{2}-\d{6})$/)[0]
+        .replace(/-/g, ':')
+        .replace(/:/g, (m, i) => (i === 2 ? ' ' : i === 8 ? '.' : ':'));
+      const timeStampB = b
+        .match(/(\d{4}-\d{2}-\d{2}-\d{6})$/)[0]
+        .replace(/-/g, ':')
+        .replace(/:/g, (m, i) => (i === 2 ? ' ' : i === 8 ? '.' : ':'));
+      return new Date(timeStampB) - new Date(timeStampA);
+    });
+
+  // Find the index of the current directory
+  const currentIndex = sortedDirs.indexOf(path.basename(currentDir));
+
+  // Return the previous directory if it exists
+  return currentIndex >= 0 && currentIndex + 1 < sortedDirs.length
+    ? path.join(parentDir, sortedDirs[currentIndex + 1])
+    : null;
+}

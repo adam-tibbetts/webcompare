@@ -9,6 +9,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "pixelmatch": "^5.3.0",
+        "pngjs": "^7.0.0",
         "puppeteer": "^21.1.1",
         "xel": "^0.24.4"
     },
