@@ -219,22 +219,32 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   sitesContainer.appendChild(contentDiv);
 }
 
-// Global array to track selected tabs
-let selectedTabs = [];
+let selectedTabs = []; // Tracks the IDs of selected tabs
 
 function showTabContent(siteName) {
   const contentDivId = `content-${siteName}`;
   const tabButtonId = `tab-${siteName}`;
   const index = selectedTabs.indexOf(contentDivId);
 
-  // Toggle the selection state of the tab
+  // Check if the tab is already selected
   if (index > -1) {
     // If the tab is already selected, deselect it
     selectedTabs.splice(index, 1);
     document.getElementById(tabButtonId).classList.remove('active');
   } else {
     // Add the tab to the selectedTabs array if not already selected
-    if (!selectedTabs.includes(contentDivId)) {
+    // Ensure that no more than two tabs can be selected at any time
+    if (selectedTabs.length < 2) {
+      selectedTabs.push(contentDivId);
+      document.getElementById(tabButtonId).classList.add('active');
+    } else {
+      // If trying to select a third tab, deselect the first selected tab
+      const firstSelectedTabId = selectedTabs.shift(); // Remove and get the first element
+      document
+        .getElementById(firstSelectedTabId.replace('content-', 'tab-'))
+        .classList.remove('active');
+
+      // Now add the new selection
       selectedTabs.push(contentDivId);
       document.getElementById(tabButtonId).classList.add('active');
     }
