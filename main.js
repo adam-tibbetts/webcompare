@@ -155,3 +155,41 @@ function findPreviousDir(currentDir) {
     ? path.join(parentDir, sortedDirs[currentIndex + 1])
     : null;
 }
+
+ipcMain.handle(
+  'compare-screenshots',
+  async (event, { currentDir, previousDir }) => {
+    console.log('Starting comparison...');
+    try {
+      const totalDifferences = await imageCompare.compareScreenshotSets(
+        currentDir,
+        previousDir
+      );
+      console.log(`Total differences found: ${totalDifferences}`);
+
+      // Comparison images are saved in a 'diffs' subfolder within currentDir
+      console.log('Reading diffs directory...');
+      const diffsDir = path.join(currentDir, 'diffs');
+      console.log(`Reading from diffs directory: ${diffsDir}`);
+
+      const files = await readDirectory(diffsDir);
+      console.log(`readDirectory returned:`, files); // Log what readDirectory is returning
+
+      // Filter out directories and keep only image file paths
+      console.log(`Filtering image paths...`);
+      const imagePaths = files
+        .filter((file) => !file.isDirectory())
+        .map((file) => path.join(diffsDir, file.name)); // Construct the full path
+      console.log(`Filtered image paths: ${imagePaths}`);
+
+      return {
+        success: true,
+        totalDifferences,
+        comparisonImagePaths: imagePaths,
+      };
+    } catch (error) {
+      console.error('Error comparing screenshots:', error);
+      return { success: false, error: error.message };
+    }
+  }
+);

@@ -40,6 +40,28 @@ img {
   margin-left: 14px;
 }
 
+.image-container {
+  position: relative;
+  display: inline-block; 
+  /* margin: 10px;  */
+}
+
+.image-container img {
+  display: block;
+  max-width: 100%; 
+  height: auto; 
+}
+
+.comparison-image {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; 
+  /* mix-blend-mode: difference;  */
+}
+
+
 /* ##################### CSS for tabs ##################### */
 #tabs-container {
   display: flex;

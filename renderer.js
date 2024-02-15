@@ -206,15 +206,28 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   const contentDiv = document.createElement('div');
   contentDiv.id = `content-${siteName}`; // Ensure the ID matches the pattern used in the JavaScript logic
   contentDiv.className = 'tab-content';
-  contentDiv.style.display = 'none'; // Hide content by default
+  contentDiv.style.display = 'none'; // Hide content by default. #FIXME: Redundant?
 
   imageFiles.forEach((filePath) => {
+    const imageContainer = document.createElement('div');
+    imageContainer.classList.add('image-container');
+
+    // Extract filename from filePath and determine if it's a diff image
+    const filename = filePath.split('/').pop(); // Adjust according to your path separator if necessary
+    const isDiffImage = filename.startsWith('diff-');
+    const dataFilename = isDiffImage ? filename.substring(5) : filename; // Remove 'diff-' prefix for diff images
+
+    // Set data-filename attribute for matching original and diff images
+    imageContainer.setAttribute('data-filename', dataFilename);
+
     const imgElement = document.createElement('img');
     imgElement.src = `file://${filePath}`;
     imgElement.alt = 'Screenshot';
-    contentDiv.appendChild(imgElement);
-  });
+    imgElement.classList.add(isDiffImage ? 'diff-image' : 'original-image'); // Optionally differentiate styles
 
+    imageContainer.appendChild(imgElement);
+    contentDiv.appendChild(imageContainer);
+  });
   // Append content to the sites container
   sitesContainer.appendChild(contentDiv);
 }
@@ -266,6 +279,9 @@ function showTabContent(siteName) {
   } else {
     sitesContainer.classList.remove('two-columns');
   }
+  // Enable compare button if two tabs are selected
+  const compareButton = document.getElementById('compareScreenshotsButton');
+  compareButton.disabled = selectedTabs.length !== 2;
 }
 
 function formatDateAndTime(date, time) {
@@ -296,3 +312,95 @@ function formatDateAndTime(date, time) {
     return `${date} ${time}`; // Return a fallback string in case of error
   }
 }
+
+document
+  .getElementById('compareScreenshotsButton')
+  .addEventListener('click', () => {
+    if (selectedTabs.length === 2) {
+      const [firstTabPath, secondTabPath] = selectedTabs.map((tabId) => {
+        const siteName = tabId.replace('content-', '');
+        return window.selectedDirectory + '/' + siteName;
+      });
+
+      const newerDir =
+        firstTabPath > secondTabPath ? firstTabPath : secondTabPath;
+      const olderDir =
+        firstTabPath <= secondTabPath ? firstTabPath : secondTabPath;
+
+      document.getElementById('loading-spinner-comparison').style.display =
+        'block';
+
+      ipcRenderer
+        .invoke('compare-screenshots', {
+          currentDir: newerDir,
+          previousDir: olderDir,
+        })
+        .then(({ success, totalDifferences, error, comparisonImagePaths }) => {
+          document.getElementById('loading-spinner-comparison').style.display =
+            'none';
+
+          if (
+            Array.isArray(comparisonImagePaths) &&
+            comparisonImagePaths.length > 0
+          ) {
+            comparisonImagePaths.forEach((comparisonImagePath) => {
+              console.log('Attempting to display image:', comparisonImagePath);
+
+              // Normalize the comparison image path for consistent comparison
+              let normalizedComparisonPath = comparisonImagePath.replace(
+                /\\/g,
+                '/'
+              );
+
+              // Remove the '/diffs/diff-' part from the path to match the data-filename format
+              let adjustedPathForComparison = normalizedComparisonPath.replace(
+                '/diffs/diff-',
+                '/'
+              );
+
+              // Find the appropriate container by checking if the adjusted path includes the container's data-filename
+              const containers = document.querySelectorAll('.image-container');
+              const container = Array.from(containers).find((container) => {
+                // Normalize the container's data-filename path for consistent comparison
+                let containerDataFilename = container
+                  .getAttribute('data-filename')
+                  .replace(/\\/g, '/');
+                // Check if the adjusted comparison image path includes this container's data-filename
+                return adjustedPathForComparison.includes(
+                  containerDataFilename
+                );
+              });
+
+              if (container) {
+                console.log(
+                  'Container for diff image to be added to: ',
+                  container
+                );
+                // Create the <img> element for the comparison image
+                const comparisonImg = document.createElement('img');
+                comparisonImg.src = `file://${comparisonImagePath}`;
+                comparisonImg.alt = 'Comparison Image';
+                comparisonImg.classList.add('comparison-image');
+
+                // Append the new <img> element to the found container
+                container.appendChild(comparisonImg);
+
+                console.log('Image appended to container:', comparisonImg);
+              } else {
+                console.error(
+                  'Container not found for:',
+                  adjustedPathForComparison
+                );
+              }
+            });
+          } else {
+            console.warn('No comparison images to display.');
+          }
+        })
+        .catch((error) => {
+          document.getElementById('loading-spinner-comparison').style.display =
+            'none';
+          console.error('Error invoking compare-screenshots:', error);
+        });
+    }
+  });
