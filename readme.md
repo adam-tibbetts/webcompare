@@ -2,14 +2,18 @@
 
 WebCompare is an Electron app that streamlines the process of tracking website changes. It grabs screenshots so you can compare them with past versions. Ideal for web developers, QA engineers, and content managers, it ensures updates haven't caused any issues.
 
-## Features
+## Current Features
 
-- **Screenshot Capture**: Automatically grab screenshots of specified websites.
-- **Algorithmic Comparison**: Compare the latest screenshots with a previous set using an image comparison algorithm.
+- **Screenshot Capture**: Grab screenshots of specified websites.
+- **Algorithmic Comparison**: Compare the latest screenshots with a previous set using pixelmatch.
 - **Change Detection**: Highlight differences and detect changes or breaks on the site.
+- **Cross-Platform Support**: Works on Windows, macOS, and Linux.
+
+## Planned Features
+
+- **Scheduled Screenshot Capture**: Periodically capture a set of screenshots.
 - **Flexible Scheduling**: Set up periodic captures to keep track of changes over time.
 - **Notification System**: Receive alerts when significant changes are detected.
-- **Cross-Platform Support**: Works on Windows, macOS, and Linux.
 
 ## Getting Started
 
@@ -44,11 +48,9 @@ npm start
 
 1. Open the application.
 2. Enter the URL of the website you want to monitor.
-3. Configure the capture settings (e.g., frequency, resolution).
+3. Configure the capture settings.
 4. Set up comparison parameters and thresholds for change detection.
 5. Start the monitoring process.
-
-The application will take care of the rest, capturing screenshots at the configured intervals and comparing them to detect any changes.
 
 ## Building the Application
 
@@ -62,7 +64,7 @@ This will generate a distributable version of the app for your platform.
 
 ## Contributing
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Feel free! Though be aware the app is changing rapidly, as it's very, very new.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
