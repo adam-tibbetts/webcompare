@@ -42,25 +42,24 @@ img {
 
 .image-container {
   position: relative;
-  display: inline-block; 
+  display: inline-block;
   /* margin: 10px;  */
 }
 
 .image-container img {
   display: block;
-  max-width: 100%; 
-  height: auto; 
+  max-width: 100%;
+  height: auto;
 }
 
 .comparison-image {
-  position: absolute; 
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   /* mix-blend-mode: difference;  */
 }
-
 
 /* ##################### CSS for tabs ##################### */
 #tabs-container {
@@ -81,19 +80,18 @@ img {
 }
 
 .active {
-  background-color: #ccc; /* Darker background for active tabs */
-  color: white; /* Optional: change text color for better contrast */
+  background-color: #ccc;
+  color: white;
 }
 
 .tab-content {
-  display: none; /* Hidden by default */
+  display: none;
   padding: 20px;
   border: 1px solid #ccc;
   border-top: none;
-  box-sizing: border-box; /* Ensures padding is included in the width */
+  box-sizing: border-box;
 }
 
-/* Style the active class, and buttons on mouse-over */
 .tab:hover {
   background-color: #ddd;
 }
@@ -103,16 +101,14 @@ img {
   background-color: #ccc;
 }
 
-/* New styles for two-column layout */
 #sites-container.two-columns .tab-content {
-  width: 50%; /* Each content takes half the width */
-  float: left; /* Align side by side */
-  display: block; /* Show the content */
-  height: auto; /* Adjust height as needed */
-  overflow: hidden; /* Adjust as needed to manage long content */
+  width: 50%;
+  float: left;
+  display: block;
+  height: auto;
+  overflow: hidden;
 }
 
-/* Clearfix for the two-column layout */
 #sites-container.two-columns::after {
   content: '';
   clear: both;
