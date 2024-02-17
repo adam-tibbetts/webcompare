@@ -74,13 +74,12 @@ ipcRenderer.on('screenshot-saved', (event, screenshotPath) => {
   const listItem = document.createElement('div');
   const image = document.createElement('img');
 
-  image.src = screenshotPath; // Set the source of the image to the screenshot path
-  image.alt = 'Screenshot'; // Set an alt text for the image
-  image.style.width = '100px'; // Optional: Set a width for the image if you want to resize it
-  image.style.height = 'auto'; // Optional: Keep the aspect ratio
-
-  listItem.appendChild(image); // Append the image to the list item
-  list.appendChild(listItem); // Append the list item to the list
+  image.src = screenshotPath;
+  image.alt = 'Screenshot';
+  image.style.width = '100px';
+  image.style.height = 'auto';
+  listItem.appendChild(image);
+  list.appendChild(listItem);
 });
 
 document
@@ -105,6 +104,17 @@ document
       console.error('Error selecting directory:', error);
     }
   });
+
+ipcRenderer.on('set-working-directory', (event, workingDirectory) => {
+  if (workingDirectory) {
+    console.log('Received working directory:', workingDirectory);
+    window.selectedDirectory = workingDirectory; // Store the selected directory path
+    document.getElementById(
+      'selected-directory-display'
+    ).textContent = `Selected Directory: ${workingDirectory}`;
+    displayAllSites(workingDirectory);
+  }
+});
 
 async function displayAllSites(parentDirectory) {
   console.log(`Displaying all sites for directory: ${parentDirectory}`);

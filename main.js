@@ -6,6 +6,11 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+const settingsFilePath = path.join(app.getPath('userData'), 'settings.json');
+console.log('############################## ', settingsFilePath)
+
+let mainWindow;
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -17,6 +22,13 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    const workingDirectory = loadWorkingDirectory();
+    if (workingDirectory) {
+      mainWindow.webContents.send('set-working-directory', workingDirectory);
+    }
+  });
 }
 
 app.whenReady().then(createWindow);
@@ -27,9 +39,28 @@ async function selectDirectory() {
   });
 
   if (directory) {
-    return directory[0]; // Return the selected directory path
+    const selectedDirectory = directory[0];
+    saveWorkingDirectory(selectedDirectory); // Save the selected directory
+    return selectedDirectory;
   }
-  return null; // Return null if no directory was selected
+  return null;
+}
+
+function saveWorkingDirectory(directoryPath) {
+  const settings = { workingDirectory: directoryPath };
+  fs.writeFileSync(settingsFilePath, JSON.stringify(settings), 'utf-8');
+}
+
+function loadWorkingDirectory() {
+  try {
+    if (fs.existsSync(settingsFilePath)) {
+      const settings = JSON.parse(fs.readFileSync(settingsFilePath, 'utf-8'));
+      return settings.workingDirectory;
+    }
+  } catch (error) {
+    console.error('Failed to load the working directory:', error);
+  }
+  return null;
 }
 
 ipcMain.handle('select-directory', selectDirectory);
