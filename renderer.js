@@ -3,6 +3,36 @@ const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggle = document.getElementById('themeToggle');
+  const themeMetaTag = document.querySelector('meta[name="xel-theme"]');
+
+  // Check if the application is in dark mode at startup
+  if (
+    themeMetaTag.getAttribute('content') ===
+    'node_modules/xel/themes/adwaita-dark.css'
+  ) {
+    themeToggle.setAttribute('toggled', ''); // Set the switch to dark mode
+  } else {
+    themeToggle.removeAttribute('toggled'); // Ensure the switch is in light mode
+  }
+
+  themeToggle.addEventListener('toggle', () => {
+    console.log('Theme Toggle toggled');
+    if (themeToggle.hasAttribute('toggled')) {
+      themeMetaTag.setAttribute(
+        'content',
+        'node_modules/xel/themes/adwaita-dark.css'
+      );
+    } else {
+      themeMetaTag.setAttribute(
+        'content',
+        'node_modules/xel/themes/adwaita.css'
+      );
+    }
+  });
+});
+
 document
   .getElementById('generateUrlListButton')
   .addEventListener('click', () => {
@@ -53,21 +83,24 @@ ipcRenderer.on('url-list-generated', (event, urlList) => {
   document.getElementById('startCrawlButton').disabled = false;
 });
 
-document.getElementById('settings-form').addEventListener('submit', (event) => {
-  event.preventDefault();
+document
+  .getElementById('startCrawlButton')
+  .addEventListener('click', function () {
+    // Gather settings from the form elements
+    const settings = {
+      baseUrl: document.getElementById('baseUrl').value,
+      depth: document.getElementById('depth').value, // Ensure this was not omitted
+      directory: window.selectedDirectory,
+    };
 
-  const settings = {
-    baseUrl: document.getElementById('baseUrl').value,
-    directory: window.selectedDirectory,
-  };
+    // Collect URLs from checked checkboxes
+    const urlList = Array.from(
+      document.querySelectorAll('#url-list li input:checked')
+    ).map((checkbox) => checkbox.nextElementSibling.textContent);
 
-  // Get only the checked URLs
-  const urlList = Array.from(
-    document.querySelectorAll('#url-list li input:checked')
-  ).map((checkbox) => checkbox.nextElementSibling.textContent);
-
-  ipcRenderer.send('start-crawl', settings, urlList);
-});
+    // Send the settings and URL list to the main process for crawling
+    ipcRenderer.send('start-crawl', settings, urlList);
+  });
 
 ipcRenderer.on('screenshot-saved', (event, screenshotPath) => {
   const list = document.getElementById('image-list');
@@ -175,7 +208,7 @@ async function displayAllSites(parentDirectory) {
 
 function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   console.log(`Displaying images for site: ${siteName}`);
-  const tabsContainer = document.getElementById('tabs-container'); // Container for tabs
+  const tabsContainer = document.getElementById('x-tabs'); // Container for tabs
   const sitesContainer = document.getElementById('sites-container'); // Container for content
   if (!tabsContainer || !sitesContainer) {
     console.error(
@@ -201,16 +234,22 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   const formattedDate = formatDateAndTime(date, time); // Assuming formatDateAndTime is a function you've defined elsewhere
 
   // Create tab
-  const tabButton = document.createElement('button');
-  tabButton.className = 'tab';
-  tabButton.id = `tab-${siteName}`; // Assign a unique ID based on siteName
-  tabButton.textContent = `${siteName.split('-')[0]} ${formattedDate}`;
-  tabButton.onclick = function () {
+  const tab = document.createElement('x-tab');
+  tab.id = `tab-${siteName}`; // Assign a unique ID based on siteName
+
+  // Create an x-label element
+  const label = document.createElement('x-label');
+  label.textContent = `${siteName.split('-')[0]} ${formattedDate}`;
+
+  // Append the x-label to the x-tab
+  tab.appendChild(label);
+
+  tab.onclick = function () {
     showTabContent(siteName);
   };
 
   // Append the tab to the tabs container
-  tabsContainer.appendChild(tabButton);
+  tabsContainer.appendChild(tab);
 
   // Create content div for this site
   const contentDiv = document.createElement('div');

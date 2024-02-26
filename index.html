@@ -1,50 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';"> -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="node_modules/xel/xel.js" type="module"></script>
-  <link rel="stylesheet" href="styles/main.css" />
-  <link rel="stylesheet" href="styles/spinner.css" />
-  <link rel="stylesheet" href="node_modules/xel/themes/adwaita.css" />
-  <meta name="xel-accent-color" content="green" />
-</head>
-
-<section>
-  <h1>WebCompare pre-alpha</h1>
-  <h2>Settings</h2>
-  <button id="select-directory">Select Directory</button>
-  <p id="selected-directory-display">Selected directory: None</p>
-  <form id="settings-form">
-    <h4>Site URL</h4>
-    <input type="text" id="baseUrl" value="https://seoplus.com/" />
-    <h4>Crawl depth</h4>
-    <input type="number" id="depth" value="1" min="0" />
-    <input type="button" id="generateUrlListButton" value="Generate URL List" />
-    <input
-      type="submit"
-      id="startCrawlButton"
-      value="Start Crawling"
-      disabled
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="node_modules/xel/xel.js" type="module"></script>
+    <meta name="xel-theme" content="node_modules/xel/themes/adwaita-dark.css" />
+    <meta name="xel-accent-color" content="#116e43" />
+    <meta
+      name="xel-iconsets"
+      content="node_modules/xel/iconsets/material.svg"
     />
-  </form>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/spinner.css" />
+  </head>
 
-  <h2>URLs to be crawled</h2>
-  <div id="loading-spinner" class="spinner" style="display: none"></div>
-  <ul id="url-list"></ul>
+  <x-box>
+    <x-label>Dark Mode:</x-label>
+    <x-switch id="themeToggle"></x-switch>
+  </x-box>
 
-  <h2>Screenshots Taken</h2>
-  <ul id="screenshot-list"></ul>
+  <x-box vertical>
+    <h1>WebCompare pre-alpha</h1>
+    <x-accordion expanded>
+      <header><x-label>Take Screenshots</x-label></header>
+      <main>
+        <x-box vertical
+          ><h2>Take Screenshots</h2>
+          <x-button id="select-directory">Select Directory</x-button>
+          <p id="selected-directory-display">Selected directory: None</p>
+          <form id="settings-form">
+            <h4>Site URL</h4>
+            <x-input
+              type="url"
+              id="baseUrl"
+              value="https://seoplus.com/"
+            ></x-input>
+            <h4>Crawl depth</h4>
+            <x-numberinput id="depth" value="1" min="0" max="12">
+              <x-stepper></x-stepper>
+            </x-numberinput>
+            <x-button id="generateUrlListButton">Generate URL List</x-button>
+            <x-button id="startCrawlButton" disabled>Start Crawling</x-button>
+          </form>
 
-  <h2>Screenshots</h2>
-  <input type="button" id="compareScreenshotsButton" value="Compare Screenshots" disabled />
-  <div id="loading-spinner-comparison" class="spinner" style="display: none"></div>
+          <h2>URLs to be crawled</h2>
+          <x-throbber id="loading-spinner" style="display: none"></x-throbber>
+          <ul id="url-list"></ul>
+        </x-box>
+        <x-box>
+          <h2>Screenshots Taken</h2>
+          <ul id="screenshot-list"></ul>
+        </x-box>
+      </main>
+    </x-accordion>
 
-  <div id="tabs-container"></div> <!-- Container for tabs -->
-  <div id="sites-container"></div> <!-- Container for content -->
+    <h2>Screenshots by date</h2>
+    <x-button id="compareScreenshotsButton" disabled
+      >Compare Screenshots</x-button
+    >
+    <x-throbber
+      id="loading-spinner-comparison"
+      style="display: none"
+    ></x-throbber>
 
-  </div>
-</section>
+    <x-tabs id="x-tabs"></x-tabs>
+    <div id="sites-container"></div>
+  </x-box>
 
-<script src="renderer.js"></script>
+  <script src="renderer.js"></script>
+</html>

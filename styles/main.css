@@ -62,43 +62,14 @@ img {
 }
 
 /* ##################### CSS for tabs ##################### */
-#tabs-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  align-items: center;
-}
-
-.tab {
-  padding: 10px;
-  cursor: pointer;
-  border: none;
-  background-color: #f1f1f1;
-  margin-top: 5px;
-  margin-right: 5px;
-  display: inline-block;
-}
 
 .active {
-  background-color: #ccc;
-  color: white;
+  border-color: var(--accent-color);
 }
 
 .tab-content {
   display: none;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-top: none;
-  box-sizing: border-box;
-}
-
-.tab:hover {
-  background-color: #ddd;
-}
-
-.active,
-.tab:hover {
-  background-color: #ccc;
 }
 
 #sites-container.two-columns .tab-content {
