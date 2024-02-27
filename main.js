@@ -43,7 +43,7 @@ async function selectDirectory() {
     saveWorkingDirectory(selectedDirectory); // Save the selected directory
     return selectedDirectory;
   }
-  return null;
+  return null
 }
 
 function saveWorkingDirectory(directoryPath) {
@@ -98,7 +98,7 @@ ipcMain.handle(
   'read-directory',
   async (event, directoryPath, includeSubdirectories = false) => {
     try {
-      console.log('receiving read-directory ipcMain.handle', directoryPath);
+      // console.log('receiving read-directory ipcMain.handle', directoryPath);
 
       const files = await readDirectory(directoryPath, includeSubdirectories);
 

@@ -5,6 +5,37 @@ body {
   padding: 20px;
 }
 
+/* ################# ELEMENT FORMATTING ################### */
+
+x-accordion header x-label {
+  line-height: 1.1;
+  font-size: 26px;
+  font-weight: 500 !important;
+}
+
+x-box {
+  margin: 20px;
+}
+
+footer {
+  min-height: 60px;
+}
+
+/* ################# END ELEMENT FORMATTING ################### */
+
+
+/* ################# BASIC SPACERS ################### */
+
+.space-below {
+  margin-bottom: 20px;
+}
+
+/* ################# END BASIC SPACERS ################### */
+
+.align-start {
+  align-items: start;
+}
+
 #url-list {
   list-style-type: none;
   padding-left: 0;
@@ -24,6 +55,10 @@ img {
 
 .imageSection {
   width: 50%;
+}
+
+#settings-form > * {
+  margin-bottom: 10px;
 }
 
 #sites-container {
