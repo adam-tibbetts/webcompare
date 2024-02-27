@@ -9,6 +9,8 @@ const util = require('util');
 const settingsFilePath = path.join(app.getPath('userData'), 'settings.json');
 console.log('############################## ', settingsFilePath);
 
+const { app, BrowserWindow } = require('electron');
+
 let mainWindow;
 
 function createWindow() {
@@ -22,6 +24,11 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+
+  // Hide the menu bar in production
+  if (app.isPackaged) {
+    mainWindow.setMenu(null);
+  }
 
   mainWindow.webContents.on('did-finish-load', () => {
     const workingDirectory = loadWorkingDirectory();
@@ -201,10 +208,10 @@ ipcMain.handle(
       // Comparison images are saved in a 'diffs' subfolder within currentDir
       console.log('Reading diffs directory...');
       const diffsDir = path.join(currentDir, 'diffs');
-      console.log(`Reading from diffs directory: ${diffsDir}`);
+      // console.log(`Reading from diffs directory: ${diffsDir}`);
 
       const files = await readDirectory(diffsDir);
-      console.log(`readDirectory returned:`, files); // Log what readDirectory is returning
+      // console.log(`readDirectory returned:`, files);
 
       // Filter out directories and keep only image file paths
       console.log(`Filtering image paths...`);

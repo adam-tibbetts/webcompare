@@ -60,6 +60,9 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+# Electron-forge output
+out/
+
 # Yarn Integrity file
 .yarn-integrity
 

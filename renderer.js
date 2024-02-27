@@ -91,20 +91,18 @@ document
           checkbox.type = 'checkbox';
           checkbox.id = `url-checkbox-${index}`; // Unique ID for each checkbox
           checkbox.checked = true; // By default, all checkboxes are checked
-          checkbox.classList.add('url-checkbox'); // Class for styling or selecting checkboxes
+          checkbox.classList.add('url-checkbox');
 
           const label = document.createElement('label');
           label.htmlFor = checkbox.id;
           label.textContent = url;
-          label.style.marginLeft = '8px'; // Add some space between the checkbox and the label
-
+          label.style.marginLeft = '8px';
           li.appendChild(checkbox);
           li.appendChild(label);
           ulElement.appendChild(li);
         });
       })
       .catch((error) => {
-        // Handle the error, possibly by showing an error message to the user
         console.error('Error generating URL list:', error);
         document.getElementById('loading-spinner').style.display = 'none';
       });
@@ -120,19 +118,16 @@ ipcRenderer.on('url-list-generated', (event, urlList) => {
 document
   .getElementById('startCrawlButton')
   .addEventListener('click', function () {
-    // Gather settings from the form elements
     const settings = {
       baseUrl: document.getElementById('baseUrl').value,
-      depth: document.getElementById('depth').value, // Ensure this was not omitted
+      depth: document.getElementById('depth').value,
       directory: window.selectedDirectory,
     };
 
-    // Collect URLs from checked checkboxes
     const urlList = Array.from(
       document.querySelectorAll('#url-list li input:checked')
     ).map((checkbox) => checkbox.nextElementSibling.textContent);
 
-    // Send the settings and URL list to the main process for crawling
     ipcRenderer.send('start-crawl', settings, urlList);
   });
 
@@ -159,7 +154,7 @@ document
 
       if (parentDirectory) {
         console.log('Directory selection successful.');
-        window.selectedDirectory = parentDirectory; // Store the selected directory path
+        window.selectedDirectory = parentDirectory;
         document.getElementById(
           'selected-directory-display'
         ).textContent = `Selected Directory: ${parentDirectory}`;
@@ -175,7 +170,7 @@ document
 ipcRenderer.on('set-working-directory', (event, workingDirectory) => {
   if (workingDirectory) {
     console.log('Received working directory:', workingDirectory);
-    window.selectedDirectory = workingDirectory; // Store the selected directory path
+    window.selectedDirectory = workingDirectory;
     document.getElementById(
       'selected-directory-display'
     ).textContent = `Selected Directory: ${workingDirectory}`;
@@ -192,7 +187,7 @@ async function displayAllSites(parentDirectory) {
     return;
   }
 
-  sitesContainer.innerHTML = ''; // Clear previous content
+  sitesContainer.innerHTML = '';
 
   try {
     const entries = await ipcRenderer.invoke(
@@ -242,8 +237,8 @@ async function displayAllSites(parentDirectory) {
 
 function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   console.log(`Displaying images for site: ${siteName}`);
-  const tabsContainer = document.getElementById('x-tabs'); // Container for tabs
-  const sitesContainer = document.getElementById('sites-container'); // Container for content
+  const tabsContainer = document.getElementById('x-tabs');
+  const sitesContainer = document.getElementById('sites-container');
   if (!tabsContainer || !sitesContainer) {
     console.error(
       'Failed to find the tabs-container or sites-container elements for displaying images.'
@@ -252,7 +247,6 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   }
 
   // Use a regular expression to extract the date and time from the siteName
-  // The format is assumed to be "example.com-YYYYMMDD-HHMMSS"
   const match = siteName
     .trim()
     .match(/-(\d{4})-(\d{2})-(\d{2})-(\d{2})(\d{2})\d{2}$/);
@@ -265,27 +259,22 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
   const [_, year, month, day, hour, minute] = match;
   const date = `${year}-${month}-${day}`;
   const time = `${hour}:${minute}`;
-  const formattedDate = formatDateAndTime(date, time); // Assuming formatDateAndTime is a function you've defined elsewhere
+  const formattedDate = formatDateAndTime(date, time);
 
-  // Create tab
   const tab = document.createElement('x-tab');
-  tab.id = `tab-${siteName}`; // Assign a unique ID based on siteName
+  tab.id = `tab-${siteName}`;
 
-  // Create an x-label element
   const label = document.createElement('x-label');
   label.textContent = `${siteName.split('-')[0]} ${formattedDate}`;
 
-  // Append the x-label to the x-tab
   tab.appendChild(label);
 
   tab.onclick = function () {
     showTabContent(siteName);
   };
 
-  // Append the tab to the tabs container
   tabsContainer.appendChild(tab);
 
-  // Create content div for this site
   const contentDiv = document.createElement('div');
   contentDiv.id = `content-${siteName}`; // Ensure the ID matches the pattern used in the JavaScript logic
   contentDiv.className = 'tab-content';
@@ -296,7 +285,7 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
     imageContainer.classList.add('image-container');
 
     // Extract filename from filePath and determine if it's a diff image
-    const filename = filePath.split('/').pop(); // Adjust according to your path separator if necessary
+    const filename = filePath.split('/').pop();
     const isDiffImage = filename.startsWith('diff-');
     const dataFilename = isDiffImage ? filename.substring(5) : filename; // Remove 'diff-' prefix for diff images
 
@@ -306,7 +295,7 @@ function displayImagesWithHeading(siteDirectory, imageFiles, siteName) {
     const imgElement = document.createElement('img');
     imgElement.src = `file://${filePath}`;
     imgElement.alt = 'Screenshot';
-    imgElement.classList.add(isDiffImage ? 'diff-image' : 'original-image'); // Optionally differentiate styles
+    imgElement.classList.add(isDiffImage ? 'diff-image' : 'original-image');
 
     imageContainer.appendChild(imgElement);
     contentDiv.appendChild(imageContainer);
@@ -349,9 +338,9 @@ function showTabContent(siteName) {
   // Update the display of each tab content based on selection
   document.querySelectorAll('.tab-content').forEach((div) => {
     if (selectedTabs.includes(div.id)) {
-      div.style.display = 'block'; // Show selected tab content
+      div.style.display = 'block';
     } else {
-      div.style.display = 'none'; // Hide unselected tab content
+      div.style.display = 'none';
     }
   });
 
