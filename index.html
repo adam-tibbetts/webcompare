@@ -15,9 +15,90 @@
     <link rel="stylesheet" href="styles/spinner.css" />
   </head>
 
-  <x-button>
-    <x-label>Settings</x-label>
-    <dialog>
+  <x-menubar>
+    <x-menuitem>
+      <x-label>Menu</x-label>
+      <x-menu>
+        <x-menuitem id="settingsMenuItem">
+          <x-label>Settings</x-label>
+        </x-menuitem>
+        <x-menuitem id="aboutMenuItem">
+          <x-label>About</x-label>
+        </x-menuitem>
+        <x-menuitem id="quitMenuItem">
+          <x-label>Quit</x-label>
+        </x-menuitem>
+      </x-menu>
+    </x-menuitem>
+  </x-menubar>
+
+  <body>
+    <x-box vertical>
+      <h1>WebCompare pre-alpha</h1>
+      <x-accordion expanded>
+        <header>
+          <x-label>Take Screenshots</x-label>
+        </header>
+        <main>
+          <x-box class="align-start">
+            <x-box vertical class="noLeftMar noTopMar">
+              <form id="settings-form">
+                <h4>Site URL</h4>
+                <x-input
+                  type="url"
+                  id="baseUrl"
+                  value="https://seoplus.com/"
+                ></x-input>
+                <h4>Crawl depth</h4>
+                <x-numberinput id="depth" value="1" min="0" max="12">
+                  <x-stepper></x-stepper>
+                </x-numberinput>
+              </form>
+            </x-box>
+            <x-box vertical class="noTopMar">
+              <h4>Generate URL list</h4>
+              <x-button id="generateUrlListButton">Generate URL List</x-button>
+            </x-box>
+            <x-box vertical class="noTopMar">
+              <h4>Start Crawling</h4>
+              <x-button id="startCrawlButton" disabled>Start Crawling</x-button>
+            </x-box>
+          </x-box>
+          <x-box vertical>
+            <h3>URLs to be crawled</h3>
+            <ul id="url-list">
+              No URLs in list.
+            </ul>
+            <x-throbber id="loading-spinner" style="display: none"></x-throbber>
+          </x-box>
+          <x-box>
+            <h3>Screenshots Taken</h3>
+            <ul id="screenshot-list"></ul>
+          </x-box>
+        </main>
+      </x-accordion>
+
+      <x-accordion>
+        <header><x-label>Compare Screenshots</x-label></header>
+        <main>
+          <x-box vertical>
+            <x-button id="compareScreenshotsButton" disabled
+              >Highlight differences</x-button
+            >
+            <x-throbber
+              id="loading-spinner-comparison"
+              style="display: none"
+            ></x-throbber>
+
+            <x-tabs id="x-tabs"></x-tabs>
+            <div id="sites-container"></div>
+          </x-box>
+        </main>
+      </x-accordion>
+    </x-box>
+  </body>
+  <div id="Dialogs">
+    <dialog id="settingsDialog">
       <main>
         <x-box class="space-below">
           <x-label>Dark Mode:</x-label>
@@ -33,70 +114,16 @@
         <p id="selected-directory-display">Selected directory: None</p>
       </main>
     </dialog>
-  </x-button>
-
-  <x-box vertical>
-    <h1>WebCompare pre-alpha</h1>
-    <x-accordion>
-      <header>
-        <x-label>Take Screenshots</x-label>
-      </header>
+    <dialog id="aboutDialog">
       <main>
-        <x-box class="align-start">
-          <x-box vertical>
-            <form id="settings-form">
-              <h4>Site URL</h4>
-              <x-input
-                type="url"
-                id="baseUrl"
-                value="https://seoplus.com/"
-              ></x-input>
-              <h4>Crawl depth</h4>
-              <x-numberinput id="depth" value="1" min="0" max="12">
-                <x-stepper></x-stepper>
-              </x-numberinput>
-            </form>
-          </x-box>
-          <x-box vertical>
-            <h4>Generate URL list</h4>
-            <x-button id="generateUrlListButton">Generate URL List</x-button>
-          </x-box>
-          <x-box vertical>
-            <h4>Start Crawling</h4>
-            <x-button id="startCrawlButton" disabled>Start Crawling</x-button>
-          </x-box>
-        </x-box>
         <x-box vertical>
-          <h3>URLs to be crawled</h3>
-          <ul id="url-list">
-            No URLs in list.
-          </ul>
-          <x-throbber id="loading-spinner" style="display: none"></x-throbber>
-        </x-box>
-        <x-box>
-          <h3>Screenshots Taken</h3>
-          <ul id="screenshot-list"></ul>
+          <h2>WebCompare</h2>
+          <p>This app is still incomplete, though the basics are mostly in.</p>
+          <p>Version 0.0.1</p>
         </x-box>
       </main>
-    </x-accordion>
-
-    <x-accordion>
-      <header><x-label>Compare Screenshots</x-label></header>
-      <main>
-        <x-button id="compareScreenshotsButton" disabled
-          >Highlight differences</x-button
-        >
-        <x-throbber
-          id="loading-spinner-comparison"
-          style="display: none"
-        ></x-throbber>
-
-        <x-tabs id="x-tabs"></x-tabs>
-        <div id="sites-container"></div>
-      </main>
-    </x-accordion>
-  </x-box>
-
+    </dialog>
+  </div>
   <footer></footer>
   <script src="renderer.js"></script>
 </html>

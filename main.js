@@ -7,7 +7,7 @@ const path = require('path');
 const util = require('util');
 
 const settingsFilePath = path.join(app.getPath('userData'), 'settings.json');
-console.log('############################## ', settingsFilePath)
+console.log('############################## ', settingsFilePath);
 
 let mainWindow;
 
@@ -43,7 +43,7 @@ async function selectDirectory() {
     saveWorkingDirectory(selectedDirectory); // Save the selected directory
     return selectedDirectory;
   }
-  return null
+  return null;
 }
 
 function saveWorkingDirectory(directoryPath) {
@@ -224,3 +224,7 @@ ipcMain.handle(
     }
   }
 );
+
+ipcMain.on('quit-app', () => {
+  app.quit();
+});

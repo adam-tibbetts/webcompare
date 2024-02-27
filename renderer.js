@@ -33,6 +33,40 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const settingsMenuItem = document.getElementById('settingsMenuItem');
+  const settingsDialog = document.getElementById('settingsDialog');
+  const aboutMenuItem = document.getElementById('aboutMenuItem');
+  const aboutDialog = document.getElementById('aboutDialog');
+  const quitMenuItem = document.getElementById('quitMenuItem');
+
+  settingsMenuItem.addEventListener('click', () => {
+    settingsDialog
+      .showModal()
+      .then(() => {
+        console.log('Dialog opened');
+      })
+      .catch((err) => {
+        console.error('Error opening dialog: ', err);
+      });
+  });
+
+  aboutMenuItem.addEventListener('click', () => {
+    aboutDialog
+      .showModal()
+      .then(() => {
+        console.log('About opened');
+      })
+      .catch((err) => {
+        console.error('Error opening dialog: ', err);
+      });
+  });
+
+  quitMenuItem.addEventListener('click', () => {
+    ipcRenderer.send('quit-app');
+  });
+});
+
 document
   .getElementById('generateUrlListButton')
   .addEventListener('click', () => {
