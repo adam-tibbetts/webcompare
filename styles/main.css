@@ -29,6 +29,10 @@ footer {
   min-height: 60px;
 }
 
+dialog > main {
+  padding: 20px 24px 20px !important;
+}
+
 /* ################# END ELEMENT FORMATTING ################### */
 
 
@@ -44,7 +48,7 @@ footer {
   align-items: start;
 }
 
-body .noLeftMar {
+.noLeftMar {
   margin-left: 0;
 }
 

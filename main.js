@@ -6,10 +6,10 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+if (require('electron-squirrel-startup')) app.quit();
+
 const settingsFilePath = path.join(app.getPath('userData'), 'settings.json');
 console.log('############################## ', settingsFilePath);
-
-const { app, BrowserWindow } = require('electron');
 
 let mainWindow;
 

@@ -17,6 +17,12 @@ WebCompare is an Electron app that streamlines the process of tracking website c
 - **Flexible Scheduling**: Set up periodic captures to keep track of changes over time.
 - **Notification System**: Receive alerts when significant changes are detected.
 
+## Screenshots
+
+![Screenshot of webcompare's crawl url function](readme\Webcompare_Crawl.png?raw=true "Webcompare Crawl Section")
+
+![Screenshot of compare section](readme\Webcompare_Differences.png?raw=true "Webcompare Compare Section")
+
 ## Getting Started
 
 ### Prerequisites
@@ -49,10 +55,12 @@ npm start
 ### Usage
 
 1. Open the application.
-2. Enter the URL of the website you want to monitor.
-3. Configure the capture settings.
-4. Set up comparison parameters and thresholds for change detection.
-5. Start the monitoring process.
+2. Enter the URL of the website you want to monitor, and how many links to recursively follow.
+3. Hit Generate URL List
+4. Select which URLs you'd like to capture
+5. Start crawling.
+6. In the Compare Versions section, select the two tabs you'd like to compare
+7. Hit Highlight Differences
 
 ## Building the Application
 
