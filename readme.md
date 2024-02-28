@@ -19,9 +19,9 @@ WebCompare is an Electron app that streamlines the process of tracking website c
 
 ## Screenshots
 
-![Screenshot of webcompare's crawl url function](readme\Webcompare_Crawl.png?raw=true "Webcompare Crawl Section")
+![Screenshot of webcompare's crawl url function](readme/Webcompare_Crawl.png?raw=true "Webcompare Crawl Section")
 
-![Screenshot of compare section](readme\Webcompare_Differences.png?raw=true "Webcompare Compare Section")
+![Screenshot of compare section](readme/Webcompare_Differences.png?raw=true "Webcompare Compare Section")
 
 ## Getting Started
 
