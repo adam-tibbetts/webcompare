@@ -8,11 +8,11 @@ WebCompare is an Electron app that streamlines the process of tracking website c
 
 - **Screenshot Capture**: Grab screenshots of specified websites.
 - **Algorithmic Comparison**: Compare the latest screenshots with a previous set using pixelmatch.
-- **Change Detection**: Highlight differences and detect changes or breaks on the site.
 - **Cross-Platform Support**: Works on Windows, macOS, and Linux.
 
 ## Planned Features
 
+- **Change Detection**: Highlight differences and detect changes or breaks on the site.
 - **Scheduled Screenshot Capture**: Periodically capture a set of screenshots.
 - **Flexible Scheduling**: Set up periodic captures to keep track of changes over time.
 - **Notification System**: Receive alerts when significant changes are detected.
@@ -67,7 +67,7 @@ npm start
 To build the application for production, run the following command:
 
 ```bash
-npm run build
+npm run make
 ```
 
 This will generate a distributable version of the app for your platform.
