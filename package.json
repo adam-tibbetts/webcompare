@@ -20,7 +20,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "webcompare"
+            "name": "WebCompare"
           }
         },
         {
